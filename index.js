@@ -1,24 +1,32 @@
 const express = require('express');
 const request = require('request');
 const parseXML = require('xml2js').parseString;
+const ytdl = require('ytdl-core');
+const fs = require('fs');
+const db = require('./model/db.js');
+
 const app = express();
 
 var subscriptions = [];
+
+// test data
 subscriptions.push('istarusIG');
 subscriptions.push('Maroon5VEVO');
+subscriptions.push('tomstanton282');
 
 app.listen(3000, () => {
-  var inspect = require('eyes').inspector({maxLength: true});
 
-  getChannels();
+  getVideos();
 
 });
 
-function getChannels(){
+function getVideos(){
+  var inspect = require('eyes').inspector({maxLength: true});
+
   subscriptions.forEach((video) => {
     getChannelJSON(video).then(
         (result) => {
-          console.log(inspect(result.feed.entry[0]));
+          console.log(inspect(result));
         }
       )
     }
@@ -26,7 +34,7 @@ function getChannels(){
 }
 
 function addChannel(channel){
-  if (channel == '') return; // TODO throw error
+  if (isEmpty(channel)) return; // TODO throw error
 
   // check if channel already exists
   if (subscriptions.find((x) => x == channel)){
@@ -35,6 +43,18 @@ function addChannel(channel){
   subscriptions.push(channel);
 }
 
+function removeChannel(channel){
+  if (isEmpty(channel)) return; // TODO throw error
+
+  channelIndex = subscriptions.indexOf(channel);
+  subscriptions.splice(channelIndex, 1);
+
+}
+
+
+function isEmpty(string){
+  return (string == '');
+}
 
 function getChannelJSON(channel){
   return new Promise(
@@ -49,6 +69,8 @@ function getChannelJSON(channel){
       });
     });
   }
+
+
 
 
 /*
