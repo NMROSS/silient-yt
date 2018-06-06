@@ -2,7 +2,6 @@ const express = require('express');
 const request = require('request');
 const parseXML = require('xml2js').parseString;
 const ytdl = require('ytdl-core');
-const fs = require('fs');
 const db = require('./model/db.js');
 
 const app = express();
@@ -16,7 +15,7 @@ subscriptions.push('tomstanton282');
 
 app.listen(3000, () => {
 
-  getVideos();
+  //getVideos();
 
 });
 
