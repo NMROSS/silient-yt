@@ -14,14 +14,26 @@ subscriptions.push('istarusIG');
 //subscriptions.push('tomstanton282');
 
 app.listen(3000, () => {
-
-  parseChannelJSON(subscriptions[0]);
+syncVideoDB();
 
 });
 
 
-function updateVideoDB(){
-  // Bulk uploading - https://docs.mongodb.com/manual/reference/method/Bulk.find.updateOne/
+function syncVideoDB(){
+  parseChannelJSON(subscriptions[0]).then(
+    (videos) => {
+      videos.forEach((video) => {
+        let query = {id : video['id']};
+
+        db.Video.findOneAndUpdate(query, video, {upsert: true},
+          (err) => {
+            if(err) throw console.log('Error insert/updating document');
+          });
+
+        });      
+    });
+
+
 
   /*
     var testChannel = new db.Channel({
@@ -38,27 +50,35 @@ function updateVideoDB(){
 
 
 function parseChannelJSON(channel){
-  var inspect = require('eyes').inspector({maxLength: true});
+  var videosMetadata = [];
 
-  getChannelJSON(channel).then(
-    (result) => {
-      let channelTitle = result.feed.title[0];
-      let videos  = result.feed.entry;
+  if(isEmpty(channel)) throw 'channel has no value.';
 
-      videos.forEach((video) => {
-        metadata = {
-          id: video.id[0].replace('yt:video:',''),
-          title: video.title[0],
-          description: video['media:group'][0]['media:description'],
-          thumbnail: video['media:group'][0]['media:thumbnail'][0].$.url,
-          uploaded: video.published[0],
-          channelID: channelTitle
-        }
+  return new Promise(
+    (resolve, reject) => {
+      getChannelJSON(channel).then(
+        (result) => {
+          let channelTitle = result.feed.title[0];
+          let videos  = result.feed.entry;
+
+          videos.forEach((video) => {
+
+            metadata = {
+              channel     : channelTitle,
+              channelID   : result.feed['yt:channelId'][0],
+              id          : video.id[0].replace('yt:video:',''),
+              title       : video.title[0],
+              description : video['media:group'][0]['media:description'],
+              uploaded    : video.published[0],
+              thumbnail   : video['media:group'][0]['media:thumbnail'][0].$.url
+            }
+
+            videosMetadata.push(metadata);
+          });
+          resolve(videosMetadata);
+        });
       });
     }
-  )
-
-}
 
 
 function getChannelJSON(channel){
@@ -98,7 +118,7 @@ function removeChannel(channel){
 
 
 function isEmpty(string){
-  return (string == '');
+  return (string == '' || typeof string === 'undefined');
 }
 
 
@@ -106,7 +126,7 @@ function isEmpty(string){
 
 Update subscriptions using Cron job every X minutes
 List of channels(users subscribed to)
- -> get user feed list (title, video ID, description, release date)
+ -> get user feed list (title, video ID, description, release date) [DONE]
     -> Download video [youtube-dl get downnload link]
         -> render video stream
 
