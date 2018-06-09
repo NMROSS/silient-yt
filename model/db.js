@@ -15,11 +15,15 @@ var videoSchema =new Schema({
   description: String,
   thumbnail: String,
   uploaded: Date,
-  channelID: String  
+  channelID: String
 });
+
+
 
 var Channel = mongoose.model('Channel', channelSchema);
 var Video = mongoose.model('Video', videoSchema);
+
+
 
 module.exports = {
     Channel,
