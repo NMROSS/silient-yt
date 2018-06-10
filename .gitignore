@@ -1,1 +1,4 @@
 node_modules/
+subscriptions.xml
+userFeed.json
+.gitignore

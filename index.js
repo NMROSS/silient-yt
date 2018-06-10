@@ -10,17 +10,22 @@ var subscriptions = [];
 
 // test data
 subscriptions.push('istarusIG');
-//ubscriptions.push('Maroon5VEVO');
-//subscriptions.push('tomstanton282');
+subscriptions.push('tomstanton282');
 
 app.listen(3000, () => {
-syncVideoDB();
-
+  syncVideoDB();
 });
 
 
 function syncVideoDB(){
-  parseChannelJSON(subscriptions[0]).then(
+  subscriptions.forEach((channel) => {
+    addVideosDB(channel);
+  });
+}
+
+
+function addVideosDB(channel){
+  parseChannelJSON(channel).then(
     (videos) => {
       videos.forEach((video) => {
         let query = {id : video['id']};
@@ -30,22 +35,8 @@ function syncVideoDB(){
             if(err) throw console.log('Error insert/updating document');
           });
 
-        });      
+        });
     });
-
-
-
-  /*
-    var testChannel = new db.Channel({
-      name: 'test',
-      id: 't3s7',
-      lastUpdated: Date()
-    });
-
-    testChannel.save((err) => {
-      if (err) throw err;
-    })
-  */
 }
 
 
@@ -122,6 +113,9 @@ function isEmpty(string){
 }
 
 
+function getStreamURL(videoId) {
+  // https://www.npmjs.com/package/react-player
+}
 /*
 
 Update subscriptions using Cron job every X minutes
