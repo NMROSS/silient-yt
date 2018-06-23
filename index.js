@@ -2,19 +2,14 @@ const express = require('express');
 const request = require('request');
 const parseXML = require('xml2js').parseString;
 const ytdl = require('ytdl-core');
+const routes = require('./routes.js');
 const db = require('./model/db.js');
-
 const app = express();
 
 var subscriptions = [];
 
-// test data
-subscriptions.push('istarusIG');
-subscriptions.push('tomstanton282');
-
-app.listen(3000, () => {
-  syncVideoDB();
-});
+app.use('', routes);
+app.listen(3000);
 
 
 function syncVideoDB(){
@@ -111,22 +106,3 @@ function removeChannel(channel){
 function isEmpty(string){
   return (string == '' || typeof string === 'undefined');
 }
-
-
-function getStreamURL(videoId) {
-  // https://www.npmjs.com/package/react-player
-}
-/*
-
-Update subscriptions using Cron job every X minutes
-List of channels(users subscribed to)
- -> get user feed list (title, video ID, description, release date) [DONE]
-    -> Download video [youtube-dl get downnload link]
-        -> render video stream
-
-
-NOTES & Links:
- NPM package for cron job behavior - https://www.npmjs.com/package/cron
- Channel RSS example - https://www.youtube.com/feeds/videos.xml?user=istarusIG
- JSON viewer - http://jsonviewer.stack.hu/
-*/

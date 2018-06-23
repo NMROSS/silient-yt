@@ -1,5 +1,4 @@
 node_modules/
 subscriptions.xml
 userFeed.json
-.gitignore
 client/node_modules/

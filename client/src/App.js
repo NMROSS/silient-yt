@@ -1,18 +1,55 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Youtube from 'react-youtube';
+
+class VideoList extends Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      videos : {},
+    }
+  }
+
+  componentDidMount() {
+    fetch('/UCqiYX6cqxQI9CqhH_kvHeOw')
+      .then((response) => response.json())
+      .then(videos => this.setState({ videos: videos }));
+  }
+
+
+  render() {
+    let videos = this.state.videos;
+    // check if we have received json 
+    if (videos[0]) {
+      return (<ul>
+        {videos.map((video) => (
+        <li onClick={() => this.props.setVideo(video.id)}>{video.title}</li>
+        )
+      )}
+      </ul>)
+    }
+    return (<h3>Error Loading Video Subscriptions</h3>)
+  }
+}
+
 
 class App extends Component {
+  constructor(){
+    super();
+    this.state = {
+      playing: '',
+    };
+
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div className="App"> 
+          <Youtube videoId={this.state.playing}/>
+          {/*<ReactPlayer url={this.state.playing} controls='true' playing />*/}
+          <VideoList setVideo={(videoID) => this.setState({ 
+            playing : videoID
+          })}/>
       </div>
     );
   }
