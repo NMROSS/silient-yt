@@ -15,8 +15,10 @@ var videoSchema =new Schema({
   description: String,
   thumbnail: String,
   uploaded: Date,
-  channelID: String,
-  channel: String
+  channel: {
+    name : String,
+    id : String,
+  }
 });
 
 

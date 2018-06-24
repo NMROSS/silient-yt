@@ -24,7 +24,7 @@ class Channels extends Component {
       return (
         <ul>
           {channels.map(channel => (
-            <li onClick={() => this.props.setChannel(channel)}>{channel}</li>
+            <li onClick={() => this.props.setChannel(channel)}>{channel.name}</li>
           ))}
         </ul>
       )
@@ -44,8 +44,9 @@ class Video extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.channel !== prevProps.channel) {
-
-      let channel = '/channel/' + this.props.channel;
+      console.log(this.props.channel.id);
+      
+      let channel = '/channel/' + this.props.channel.id;
 
       fetch(channel)
         .then((response) => response.json())

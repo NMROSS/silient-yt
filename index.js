@@ -6,10 +6,12 @@ const routes = require('./routes.js');
 const db = require('./model/db.js');
 const app = express();
 
-var subscriptions = [];
+var subscriptions = ['istarusIG', 'tomstanton282'];
 
 app.use('', routes);
-app.listen(3000);
+app.listen(3000, () => {
+  syncVideoDB();
+});
 
 
 function syncVideoDB(){
@@ -50,8 +52,10 @@ function parseChannelJSON(channel){
           videos.forEach((video) => {
 
             metadata = {
-              channel     : channelTitle,
-              channelID   : result.feed['yt:channelId'][0],
+              channel     : {
+                name : channelTitle,
+                id : result.feed['yt:channelId'][0]
+              },
               id          : video.id[0].replace('yt:video:',''),
               title       : video.title[0],
               description : video['media:group'][0]['media:description'],

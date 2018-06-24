@@ -7,7 +7,7 @@ module.exports = {
   getChannels: function(){
     return new Promise(
       (resolve, reject) => {
-        db.Video.distinct('channelID')
+        db.Video.distinct('channel')
         .exec((err, channels) => {
           resolve(channels)     
         })
@@ -18,7 +18,7 @@ module.exports = {
   getVideos: function(channelID){
     return new Promise(
       (resolve, reject) => {
-        db.Video.find({channelID : channelID})
+        db.Video.find({"channel.id" : channelID})
         .exec((err, videos) => {
           resolve(videos);
         });
