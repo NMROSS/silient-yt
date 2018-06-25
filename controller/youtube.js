@@ -1,12 +1,12 @@
 const db = require('../model/db.js');
 const parseXML = require('xml2js').parseString;
-const request = require('request');
+const request = require('request'); 
 
 module.exports = {
 
 
-    addVideosDB: function (channel) {
-        this.parseChannelJSON(channel).then(
+    addVideosDB: (channel) => {
+        parseChannelJSON(channel).then(
             (videos) => {
                 videos.forEach((video) => {
                     let query = { id: video['id'] };
