@@ -1,16 +1,18 @@
 const express = require('express');
-const request = require('request');
-const parseXML = require('xml2js').parseString;
-const ytdl = require('ytdl-core');
+const request = require('request'); // remove youtube.js
+const parseXML = require('xml2js').parseString; // remove youtube.js
 const routes = require('./routes.js');
-const db = require('./model/db.js');
+const db = require('./model/db.js'); // remove youtube.js
 const app = express();
+var bodyParser = require('body-parser');
 
-var subscriptions = ['istarusIG', 'tomstanton282'];
+var subscriptions = [];
 
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true })); 
 app.use('', routes);
 app.listen(3000, () => {
-  syncVideoDB();
+  //syncVideoDB();
 });
 
 
@@ -31,7 +33,6 @@ function addVideosDB(channel){
           (err) => {
             if(err) throw console.log('Error insert/updating document');
           });
-
         });
     });
 }
@@ -74,7 +75,7 @@ function parseChannelJSON(channel){
 function getChannelJSON(channel){
   return new Promise(
     (resolve, reject) => {
-      let feedURL = `https://www.youtube.com/feeds/videos.xml?user=${channel}`;
+      let feedURL = `https://www.youtube.com/feeds/videos.xml?channel_id=${channel}`;
 
       // TODO - Only request if newer version available to reduce load on youtube and quicker checking.
       //        Check last-modifed or send If-modifed-since in http header
@@ -110,3 +111,5 @@ function removeChannel(channel){
 function isEmpty(string){
   return (string == '' || typeof string === 'undefined');
 }
+
+module.exports = { addVideosDB }

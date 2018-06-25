@@ -17,6 +17,7 @@ class Channels extends Component {
       .then(channels => this.setState({ channels: channels }));
   }
 
+
   render() {
     let channels = this.state.channels;
 
@@ -32,6 +33,7 @@ class Channels extends Component {
     return <h3>Error getting channel list</h3>
   }
 }
+
 
 
 class Video extends Component {
@@ -71,6 +73,42 @@ class Video extends Component {
   }
 }
 
+class CreateChannel extends Component{
+  constructor(){
+    super();
+
+    this.handleClick = this.handleClick.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+ 
+    this.state = {
+      channel : '',
+    }
+  }
+
+  handleChange(event){
+     this.setState({channel : event.target.value});
+  }
+    
+  handleClick(){
+    fetch('/channel/new', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ channel : this.state.channel })
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <input onChange={this.handleChange} type="text"></input>
+        <button onClick={this.handleClick}>Add</button>
+      </div>
+    ) 
+  }
+}
 
 class App extends Component {
   constructor() {
@@ -87,11 +125,12 @@ class App extends Component {
     return (
       <div className="App">
         <Youtube videoId={this.state.playing} />
-
+        <h2>Channel: </h2>
         <Channels setChannel={(channel) => this.setState({
           channel: channel
         })} />
-
+        <CreateChannel/>
+        <h2>Videos: </h2>
         <Video setVideo={(videoID) => this.setState({
           playing: videoID
         })}
