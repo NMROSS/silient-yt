@@ -11,7 +11,18 @@ class Channels extends Component {
     };
   }
 
+
   componentDidMount() {
+    this.update();
+  }
+
+
+  componentDidUpdate(){
+    this.update();
+  }
+
+
+  update() {
     fetch('/channels')
       .then((response) => response.json())
       .then(channels => this.setState({ channels: channels }));
@@ -23,11 +34,14 @@ class Channels extends Component {
 
     if (Object.keys(channels).length !== 0) {
       return (
-        <ul>
-          {channels.map(channel => (
-            <li onClick={() => this.props.setChannel(channel)}>{channel.name}</li>
-          ))}
-        </ul>
+        <div>
+          <ul>
+            {channels.map(channel => (
+              <li onClick={() => this.props.setChannel(channel)}>{channel.name}</li>
+            ))}
+          </ul>
+          <CreateChannel update={this.update}/>
+        </div>
       )
     }
     return <h3>Error getting channel list</h3>
@@ -74,7 +88,7 @@ class Video extends Component {
 }
 
 class CreateChannel extends Component{
-  constructor(){
+  constructor(props){
     super();
 
     this.handleClick = this.handleClick.bind(this);
@@ -97,13 +111,15 @@ class CreateChannel extends Component{
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ channel : this.state.channel })
-    })
+    });
+    this.setState({channel : ''});
+    this.props.update(); // call Parent component(<Channels>) to get new channels data
   }
 
   render() {
     return (
       <div>
-        <input onChange={this.handleChange} type="text"></input>
+        <input value={this.state.channel} onChange={this.handleChange} type="text"></input>
         <button onClick={this.handleClick}>Add</button>
       </div>
     ) 
@@ -124,18 +140,12 @@ class App extends Component {
 
     return (
       <div className="App">
-        <Youtube videoId={this.state.playing} />
+        <Youtube videoId={this.state.playing}/>
         <h2>Channel: </h2>
-        <Channels setChannel={(channel) => this.setState({
-          channel: channel
-        })} />
-        <CreateChannel/>
+        <Channels setChannel={(channel) => this.setState({ channel: channel })} />
         <h2>Videos: </h2>
-        <Video setVideo={(videoID) => this.setState({
-          playing: videoID
-        })}
-          channel={this.state.channel}
-        />
+        <Video setVideo={(videoID) => this.setState({ playing: videoID })}
+               channel={this.state.channel}/>
       </div>
     );
   }
