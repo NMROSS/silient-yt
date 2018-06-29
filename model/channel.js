@@ -24,5 +24,24 @@ module.exports = {
         });
       }
     )
+  },
+
+  getRecent: function (days) {
+    let recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - days);
+    
+    let query = {uploaded : {$gte : new Date(recentDate)}}
+
+    return new Promise(
+      (resolve, reject) => {
+        db.Video.find(query).exec((err, videos) => {
+          console.log(videos);
+          
+          resolve(videos);
+        });
+
+      }
+    )
+
   }
 }

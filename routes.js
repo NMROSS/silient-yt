@@ -4,10 +4,19 @@ const express = require('express'),
       router = express.Router();
 
 
+//TODO Handle Promise fail
+
+
 // Return all channels in DB
 router.get('/channels', (req, res) => {
   channel.getChannels()
     .then(channels => res.send(channels));
+});
+
+router.get('/channels/recent/:days/', (req, res) => {
+  let days = req.params.days;
+  channel.getRecent(days)
+    .then(recentVideos => res.send(recentVideos));
 });
 
 // Return all videos for given channel

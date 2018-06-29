@@ -126,6 +126,18 @@ class CreateChannel extends Component{
   }
 }
 
+
+class recentVideos extends Component{
+  constructor(){
+    super();
+    this.date = new Date();
+  }
+
+
+  
+}
+
+
 class App extends Component {
   constructor() {
     super();
@@ -134,6 +146,7 @@ class App extends Component {
       channel: '',
     };
 
+    
   }
 
   render() {
@@ -141,6 +154,8 @@ class App extends Component {
     return (
       <div className="App">
         <Youtube videoId={this.state.playing}/>
+        <h2>Recent: </h2>
+        <recentVideos/>
         <h2>Channel: </h2>
         <Channels setChannel={(channel) => this.setState({ channel: channel })} />
         <h2>Videos: </h2>
