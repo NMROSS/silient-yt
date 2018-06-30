@@ -28,15 +28,18 @@ module.exports = {
 
   getRecent: function (days) {
     let recentDate = new Date();
-    recentDate.setDate(recentDate.getDate() - days);
-    
-    let query = {uploaded : {$gte : new Date(recentDate)}}
 
     return new Promise(
       (resolve, reject) => {
-        db.Video.find(query).exec((err, videos) => {
-          console.log(videos);
-          
+        
+        if (isNaN(days))
+          reject(days + ' : is not a number');
+
+        recentDate.setDate(recentDate.getDate() - days);
+
+        let query = { uploaded: { $gte: new Date(recentDate) } }
+
+        db.Video.find(query).sort({uploaded : -1}).exec((err, videos) => {
           resolve(videos);
         });
 

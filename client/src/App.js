@@ -127,14 +127,35 @@ class CreateChannel extends Component{
 }
 
 
-class recentVideos extends Component{
-  constructor(){
+class RecentVideos extends Component{
+  constructor(props){
     super();
     this.date = new Date();
+    this.state = {
+      recent : '',
+    }
   }
 
+  componentDidMount() {
+    fetch('/channels/recent/30')
+      .then((res) => res.json())
+      .then(recentVideos => this.setState({recent : recentVideos}) );
+  }
 
-  
+  render() {
+    let videos = this.state.recent;
+
+    if (Object.keys(videos).length !== 0) {
+      
+      return (
+      <ul>
+        {videos.map((video) => (
+          <li>{video.title}</li>
+        ))}
+      </ul>)
+    }
+    return <h3>Error loading recent channels</h3>
+  }
 }
 
 
@@ -155,7 +176,7 @@ class App extends Component {
       <div className="App">
         <Youtube videoId={this.state.playing}/>
         <h2>Recent: </h2>
-        <recentVideos/>
+        <RecentVideos/>
         <h2>Channel: </h2>
         <Channels setChannel={(channel) => this.setState({ channel: channel })} />
         <h2>Videos: </h2>
