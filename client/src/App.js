@@ -2,54 +2,6 @@ import React, { Component } from 'react';
 import './App.css';
 import Youtube from 'react-youtube';
 
-
-class Channels extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      channels: {},
-    };
-  }
-
-
-  componentDidMount() {
-    this.update();
-  }
-
-
-  componentDidUpdate(){
-    this.update();
-  }
-
-
-  update() {
-    fetch('/channels')
-      .then((response) => response.json())
-      .then(channels => this.setState({ channels: channels }));
-  }
-
-
-  render() {
-    let channels = this.state.channels;
-
-    if (Object.keys(channels).length !== 0) {
-      return (
-        <div>
-          <ul>
-            {channels.map(channel => (
-              <li onClick={() => this.props.setChannel(channel)}>{channel.name}</li>
-            ))}
-          </ul>
-          <CreateChannel update={this.update}/>
-        </div>
-      )
-    }
-    return <h3>Error getting channel list</h3>
-  }
-}
-
-
-
 class Video extends Component {
   constructor(props) {
     super(props);
@@ -60,7 +12,6 @@ class Video extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.channel !== prevProps.channel) {
-      console.log(this.props.channel.id);
       
       let channel = '/channel/' + this.props.channel.id;
 
@@ -86,6 +37,36 @@ class Video extends Component {
     return (<h3>Error Loading Video Subscriptions</h3>)
   }
 }
+
+
+class Channels extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      channels: {},
+    };
+  }
+
+
+  render() {
+    let channels = this.props.channels;
+
+    if (Object.keys(channels).length !== 0) {
+      return (
+        <div>
+          <ul>
+            {channels.map(channel => (
+              <li onClick={() => this.props.setChannel(channel)}>{channel.name}</li>
+            ))}
+          </ul>
+          <CreateChannel update={this.update}/>
+        </div>
+      )
+    }
+    return <h3>Error getting channel list</h3>
+  }
+}
+
 
 class CreateChannel extends Component{
   constructor(props){
@@ -113,7 +94,6 @@ class CreateChannel extends Component{
       body: JSON.stringify({ channel : this.state.channel })
     });
     this.setState({channel : ''});
-    this.props.update(); // call Parent component(<Channels>) to get new channels data
   }
 
   render() {
@@ -137,7 +117,7 @@ class RecentVideos extends Component{
   }
 
   componentDidMount() {
-    fetch('/channels/recent/30')
+    fetch('/channels/recent/3') // channel/recent/:days set to 3 days
       .then((res) => res.json())
       .then(recentVideos => this.setState({recent : recentVideos}) );
   }
@@ -150,7 +130,7 @@ class RecentVideos extends Component{
       return (
       <ul>
         {videos.map((video) => (
-          <li>{video.title}</li>
+          <li onClick={() => this.props.setVideo(video.id)}>{video.title}</li>
         ))}
       </ul>)
     }
@@ -163,22 +143,41 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      playing: '',
-      channel: '',
-    };
+      playing  : '',
+      channel  : '',
+      channels : '',
+    };  
 
-    
+    this.syncSubscriptions = this.syncSubscriptions.bind(this);
   }
 
-  render() {
+  componentDidMount(){
+    this.syncTimer();
+  }
+
+  //TODO use Socket.io for realtime updating (will fix addChannel delay)
+  syncTimer(){
+    this.syncSubscriptions();
+    setInterval(this.syncSubscriptions, 0.5 * 60 * 1000); // 30 seconds
+  }
+
+
+  syncSubscriptions(){    
+    fetch('/channels')
+      .then((response) => response.json())
+      .then((channels) => this.setState({ channels: channels}));
+  }
+
+
+  render() {  
 
     return (
       <div className="App">
         <Youtube videoId={this.state.playing}/>
         <h2>Recent: </h2>
-        <RecentVideos/>
+        <RecentVideos setVideo={(videoID) => this.setState({ playing: videoID })}/>
         <h2>Channel: </h2>
-        <Channels setChannel={(channel) => this.setState({ channel: channel })} />
+        <Channels channels={this.state.channels} setChannel={(channel) => this.setState({ channel: channel })}/> 
         <h2>Videos: </h2>
         <Video setVideo={(videoID) => this.setState({ playing: videoID })}
                channel={this.state.channel}/>
