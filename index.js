@@ -10,7 +10,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('', routes);
 
 app.listen(3000, () => {
-    setInterval(syncSubscriptions, 30 * 60 * 1000);
+
+    //get new youtube videos and update every X minutes 
+    syncSubscriptions();
+    setInterval(syncSubscriptions, 30 * 60 * 1000); // 30 minutes
 });
 
 function syncSubscriptions() {
